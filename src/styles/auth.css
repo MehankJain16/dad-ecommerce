@@ -1,0 +1,88 @@
+.auth-box {
+  max-width: 500px !important;
+  border-radius: 18px !important;
+}
+
+.auth-card {
+  border-radius: 0.6rem !important;
+  box-shadow: 0 0 3rem 0.2rem rgba(0, 0, 0, 0.25) !important;
+  padding: 1.3rem !important;
+}
+
+.auth-header {
+  font-size: 30px !important;
+  color: black;
+}
+
+.auth-input-label {
+  color: #707070 !important;
+  font-size: 15px !important;
+}
+
+.auth-input {
+  background-color: #efefef !important;
+  padding-top: 20px !important;
+  padding-bottom: 20px !important;
+  border: none !important;
+  border-bottom: 3px solid rgba(0, 0, 0, 0) !important;
+  border-top: 3px solid rgba(0, 0, 0, 0) !important;
+  font-size: 15px !important;
+}
+
+.auth-input:focus {
+  border-bottom: 3px solid #c68c53 !important;
+  box-shadow: none !important;
+}
+
+.auth-input-error {
+  color: red !important;
+}
+
+.auth-submit-button {
+  background: #c68c53 !important;
+  border-radius: 30px !important;
+  border: none !important;
+  font-size: 14px !important;
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+  font-weight: 700 !important;
+}
+
+.auth-submit-button:hover {
+  background: #dda974 !important;
+}
+
+.auth-submit-button:focus {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.auth-switch-text {
+  color: #707070 !important;
+  font-size: 14px !important;
+  cursor: pointer !important;
+}
+
+/* TODO: Ask Designer */
+/* .auth-switch-text:hover {
+  color: #c68c53 !important;
+} */
+
+@media only screen and (max-width: 768px) {
+  .auth-box {
+    max-width: 400px !important;
+  }
+
+  .auth-card {
+    padding: 0.8rem !important;
+  }
+
+  .auth-input {
+    font-size: small !important;
+  }
+
+  .auth-input-label {
+    font-size: small !important;
+  }
+}
