@@ -1,17 +1,20 @@
-import React, { useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { Button, Card, Container, Form, Spinner } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { getFirebaseErrorMessage } from "../types/AuthError";
 import "../styles/auth.css";
 
 const Signin: React.FC = () => {
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
   const { signin } = useAuth();
+  const history = useHistory();
   const [loading, setLoading] = useState<boolean>(false);
 
   const [emailError, setEmailError] = useState<string>("");
   const [passwordError, setPasswordError] = useState<string>("");
+  const [authError, setAuthError] = useState<string>("");
 
   const validate = () => {
     if (emailRef && emailRef.current && passwordRef && passwordRef.current) {
@@ -41,25 +44,31 @@ const Signin: React.FC = () => {
     }
   };
 
-  const handleSubmit = async (e: any) => {
-    e.preventDefault();
+  const handleSubmit = useCallback(
+    async (e: any) => {
+      e.preventDefault();
 
-    if (emailRef && emailRef.current && passwordRef && passwordRef.current) {
-      if (!validate()) {
-        return false;
-      }
+      if (emailRef && emailRef.current && passwordRef && passwordRef.current) {
+        if (!validate()) {
+          return false;
+        }
 
-      // Creation Of User
-      try {
+        // Creation Of User
         setLoading(true);
-        await signin!(emailRef.current.value, passwordRef.current.value);
-      } catch (error) {
-        console.log(JSON.stringify(error));
-      }
+        try {
+          await signin!(emailRef.current.value, passwordRef.current.value);
+          setAuthError("");
+          history.replace("/");
+        } catch (error: any) {
+          console.log(error.code);
+          setAuthError(getFirebaseErrorMessage(error.code));
+        }
 
-      setLoading(false);
-    }
-  };
+        setLoading(false);
+      }
+    },
+    [history, signin]
+  );
 
   return (
     <div
@@ -70,6 +79,11 @@ const Signin: React.FC = () => {
         <Card className="auth-card">
           <Card.Body>
             <h2 className="text-center mb-4 auth-header">Sign In</h2>
+            {authError && (
+              <h4 className="text-center" style={{ color: "red" }}>
+                {authError}
+              </h4>
+            )}
             <Form onSubmit={handleSubmit}>
               <Form.Group id="email">
                 <Form.Label className="auth-input-label">Email</Form.Label>

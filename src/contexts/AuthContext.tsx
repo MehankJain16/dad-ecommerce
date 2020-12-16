@@ -1,6 +1,7 @@
 import React, { useContext, useState, useEffect } from "react";
 import { Auth } from "../types/Auth";
 import { auth } from "../firebase";
+import { db } from "../firebase";
 import firebase from "firebase";
 
 const AuthContext = React.createContext<Partial<Auth>>({});
@@ -26,18 +27,33 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return unsubscribe;
   }, []);
 
-  const signup = (email: string, password: string) => {
-    return auth.createUserWithEmailAndPassword(email, password);
+  const create = async (email: string, password: string, username: string) => {
+    try {
+      const signup = await auth.createUserWithEmailAndPassword(email, password);
+      const uid = signup.user?.uid;
+      await db.doc(`users/${uid}`).set({
+        username,
+      });
+    } catch (error: any) {
+      throw error;
+    }
+
+    return true;
   };
 
-  const signin = (email: string, password: string) => {
+  const signin = async (email: string, password: string) => {
     return auth.signInWithEmailAndPassword(email, password);
+  };
+
+  const signout = () => {
+    return auth.signOut();
   };
 
   const value: Auth = {
     currentUser: currentUser,
-    signup: signup,
+    signup: create,
     signin: signin,
+    signout: signout,
   };
 
   return (

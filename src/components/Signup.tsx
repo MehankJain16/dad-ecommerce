@@ -1,7 +1,8 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useCallback } from "react";
 import { Button, Card, Container, Form, Spinner } from "react-bootstrap";
 import { useAuth } from "../contexts/AuthContext";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
+import { getFirebaseErrorMessage } from "../types/AuthError";
 import "../styles/auth.css";
 
 const Signup: React.FC = () => {
@@ -9,11 +10,13 @@ const Signup: React.FC = () => {
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
   const { signup } = useAuth();
+  const history = useHistory();
   const [loading, setLoading] = useState<boolean>(false);
 
   const [usernameError, setUsernameError] = useState<string>("");
   const [emailError, setEmailError] = useState<string>("");
   const [passwordError, setPasswordError] = useState<string>("");
+  const [authError, setAuthError] = useState<string>("");
 
   const validate = () => {
     if (
@@ -58,34 +61,41 @@ const Signup: React.FC = () => {
     }
   };
 
-  const handleSubmit = async (e: any) => {
-    e.preventDefault();
+  const handleSubmit = useCallback(
+    async (e: any) => {
+      e.preventDefault();
 
-    if (
-      usernameRef &&
-      usernameRef.current &&
-      emailRef &&
-      emailRef.current &&
-      passwordRef &&
-      passwordRef.current
-    ) {
-      if (!validate()) {
-        return false;
+      if (
+        usernameRef &&
+        usernameRef.current &&
+        emailRef &&
+        emailRef.current &&
+        passwordRef &&
+        passwordRef.current
+      ) {
+        if (!validate()) {
+          return false;
+        }
+
+        // Creation Of User
+        try {
+          setLoading(true);
+          await signup!(
+            emailRef.current.value,
+            passwordRef.current.value,
+            usernameRef.current.value
+          );
+          history.push("/");
+        } catch (error: any) {
+          console.log(error.code);
+          setAuthError(getFirebaseErrorMessage(error.code));
+        }
+
+        setLoading(false);
       }
-
-      // Creation Of User
-      try {
-        setLoading(true);
-        await signup!(emailRef.current.value, passwordRef.current.value);
-      } catch {
-        console.log(
-          "Some Error Occured In Creating Your Account. Please Try Again Later"
-        );
-      }
-
-      setLoading(false);
-    }
-  };
+    },
+    [history, signup]
+  );
 
   return (
     <div
@@ -96,6 +106,11 @@ const Signup: React.FC = () => {
         <Card className="auth-card">
           <Card.Body>
             <h2 className="text-center mb-4 auth-header">Sign Up</h2>
+            {authError && (
+              <h4 className="text-center" style={{ color: "red" }}>
+                {authError}
+              </h4>
+            )}
             <Form onSubmit={handleSubmit}>
               <Form.Group id="username">
                 <Form.Label className="auth-input-label">Username</Form.Label>
@@ -142,6 +157,7 @@ const Signup: React.FC = () => {
                 {loading && (
                   <Spinner
                     as="span"
+                    size="sm"
                     animation="border"
                     role="status"
                     aria-hidden="true"
