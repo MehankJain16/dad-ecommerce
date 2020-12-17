@@ -1,16 +1,17 @@
 import React, { useCallback, useRef, useState } from "react";
-import { Button, Card, Container, Form, Spinner } from "react-bootstrap";
+import { Alert, Button, Card, Container, Form, Spinner } from "react-bootstrap";
 import { Link, useHistory } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { getFirebaseErrorMessage } from "../types/AuthError";
 import "../styles/auth.css";
+import google from "../assets/google.svg";
 
 const Signin: React.FC = () => {
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
-  const { signin } = useAuth();
+  const { signin, googleSignin } = useAuth();
   const history = useHistory();
   const [loading, setLoading] = useState<boolean>(false);
+  const [loadingGoogle, setLoadingGoogle] = useState<boolean>(false);
 
   const [emailError, setEmailError] = useState<string>("");
   const [passwordError, setPasswordError] = useState<string>("");
@@ -60,8 +61,29 @@ const Signin: React.FC = () => {
           setAuthError("");
           history.replace("/");
         } catch (error: any) {
-          console.log(error.code);
-          setAuthError(getFirebaseErrorMessage(error.code));
+          switch (error.code) {
+            case "auth/user-not-found":
+              setEmailError("User Not Found!");
+              break;
+            case "auth/email-already-in-use":
+              setEmailError("Email Already Registered");
+              break;
+            case "auth/internal-error":
+              setAuthError("Something went wrong. Please try again later");
+              break;
+            case "auth/weak-password":
+              setPasswordError("Please provide a strong Password");
+              break;
+            case "auth/invalid-email":
+              setEmailError("Please provide a valid Email Id!");
+              break;
+            case "auth/wrong-password":
+              setPasswordError("Invalid Password!");
+              break;
+            default:
+              setAuthError("Something went wrong.");
+              break;
+          }
         }
 
         setLoading(false);
@@ -79,11 +101,7 @@ const Signin: React.FC = () => {
         <Card className="auth-card">
           <Card.Body>
             <h2 className="text-center mb-4 auth-header">Sign In</h2>
-            {authError && (
-              <h4 className="text-center" style={{ color: "red" }}>
-                {authError}
-              </h4>
-            )}
+            {authError && <Alert variant="danger">{authError}</Alert>}
             <Form onSubmit={handleSubmit}>
               <Form.Group id="email">
                 <Form.Label className="auth-input-label">Email</Form.Label>
@@ -122,6 +140,57 @@ const Signin: React.FC = () => {
                   />
                 )}
                 {!loading && <p style={{ marginBottom: 0 }}>Sign In</p>}
+              </Button>
+              <p
+                className="text-center mb-0 mt-3"
+                style={{ color: "#AAAAAA", fontSize: 12 }}
+              >
+                OR
+              </p>
+              <Button
+                onClick={async () => {
+                  setLoadingGoogle(true);
+                  await googleSignin!()
+                    .then((result) => {
+                      // The signed-in user info.
+                      var user = result.user;
+                      console.log(user);
+                    })
+                    .catch((error) => {
+                      console.log(JSON.stringify(error));
+                    });
+                  setLoadingGoogle(false);
+                }}
+                disabled={loadingGoogle}
+                className="w-100 auth-google-button"
+              >
+                {loadingGoogle && (
+                  <Spinner
+                    as="span"
+                    size="sm"
+                    animation="border"
+                    role="status"
+                    aria-hidden="true"
+                  />
+                )}
+                {!loadingGoogle && (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <img
+                      src={google}
+                      alt="google"
+                      style={{ width: 24, height: 24, marginRight: 20 }}
+                    />
+                    <p style={{ marginBottom: 0, color: "gray" }}>
+                      Sign In With Google
+                    </p>
+                  </div>
+                )}
               </Button>
               <h4 className="text-center auth-switch-text mt-4">
                 Don't Have An Account ? <Link to="/signup">Sign Up</Link>

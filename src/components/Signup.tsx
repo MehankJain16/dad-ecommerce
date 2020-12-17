@@ -1,8 +1,7 @@
 import React, { useRef, useState, useCallback } from "react";
-import { Button, Card, Container, Form, Spinner } from "react-bootstrap";
+import { Alert, Button, Card, Container, Form, Spinner } from "react-bootstrap";
 import { useAuth } from "../contexts/AuthContext";
 import { Link, useHistory } from "react-router-dom";
-import { getFirebaseErrorMessage } from "../types/AuthError";
 import "../styles/auth.css";
 
 const Signup: React.FC = () => {
@@ -87,8 +86,29 @@ const Signup: React.FC = () => {
           );
           history.push("/");
         } catch (error: any) {
-          console.log(error.code);
-          setAuthError(getFirebaseErrorMessage(error.code));
+          switch (error.code) {
+            case "auth/user-not-found":
+              setEmailError("User Not Found!");
+              break;
+            case "auth/email-already-in-use":
+              setEmailError("Email Already Registered");
+              break;
+            case "auth/internal-error":
+              setAuthError("Something went wrong. Please try again later");
+              break;
+            case "auth/weak-password":
+              setPasswordError("Please provide a strong Password");
+              break;
+            case "auth/invalid-email":
+              setEmailError("Please provide a valid Email Id!");
+              break;
+            case "auth/wrong-password":
+              setPasswordError("Invalid Password!");
+              break;
+            default:
+              setAuthError("Something went wrong.");
+              break;
+          }
         }
 
         setLoading(false);
@@ -106,11 +126,7 @@ const Signup: React.FC = () => {
         <Card className="auth-card">
           <Card.Body>
             <h2 className="text-center mb-4 auth-header">Sign Up</h2>
-            {authError && (
-              <h4 className="text-center" style={{ color: "red" }}>
-                {authError}
-              </h4>
-            )}
+            {authError && <Alert variant="danger">{authError}</Alert>}
             <Form onSubmit={handleSubmit}>
               <Form.Group id="username">
                 <Form.Label className="auth-input-label">Username</Form.Label>

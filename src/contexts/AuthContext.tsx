@@ -1,7 +1,6 @@
 import React, { useContext, useState, useEffect } from "react";
 import { Auth } from "../types/Auth";
-import { auth } from "../firebase";
-import { db } from "../firebase";
+import { auth, provider, db } from "../firebase";
 import firebase from "firebase";
 
 const AuthContext = React.createContext<Partial<Auth>>({});
@@ -45,6 +44,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return auth.signInWithEmailAndPassword(email, password);
   };
 
+  const googleSignin = async () => {
+    return auth.signInWithPopup(provider);
+  };
+
   const signout = () => {
     return auth.signOut();
   };
@@ -53,6 +56,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     currentUser: currentUser,
     signup: create,
     signin: signin,
+    googleSignin: googleSignin,
     signout: signout,
   };
 

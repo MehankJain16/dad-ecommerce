@@ -58,6 +58,23 @@
   box-shadow: none !important;
 }
 
+.auth-google-button {
+  background: white !important;
+  border-radius: 30px !important;
+  border: none !important;
+  font-size: 14px !important;
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+  font-weight: 700 !important;
+  color: black !important;
+  /* box-shadow: 0 0 3rem 0.2rem rgba(0, 0, 0, 0.25) !important; */
+}
+
+.auth-google-button:focus {
+  border: none !important;
+  outline: none !important;
+}
+
 .auth-switch-text {
   color: #707070 !important;
   font-size: 14px !important;

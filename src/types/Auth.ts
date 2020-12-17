@@ -10,5 +10,7 @@ export type Auth = {
     password: string
   ) => Promise<firebase.auth.UserCredential>;
 
+  googleSignin: () => Promise<firebase.auth.UserCredential>;
+
   signout: () => Promise<void>;
 };
