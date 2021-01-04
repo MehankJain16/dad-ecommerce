@@ -1,30 +1,34 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import { db } from "../firebase";
+import BannerImage from "./BannerImage";
+import Header from "./Header";
+import Navbar from "./Navbar";
 
 const Home: React.FC = () => {
-  const { signout, currentUser } = useAuth();
-  const [username, setUsername] = useState("");
+  const { signout, user } = useAuth();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    const fetchUserDetails = async () => {
-      const user = await db.doc(`users/${currentUser!.uid}`).get();
-      setUsername(user.get("username"));
+    const checkAuthStatus = () => {
+      if (user) {
+        // Setting the state as logged in
+        setIsLoggedIn(true);
+      } else {
+        // Setting the state as logged out
+        setIsLoggedIn(false);
+      }
     };
-    fetchUserDetails();
-  }, [currentUser]);
+    checkAuthStatus();
+  }, [user]);
 
   return (
     <div>
-      <h4 className="text-center">Home Page</h4>
-      <h5 className="text-center">{username}</h5>
-      <h4
-        onClick={async () => {
-          await signout!();
-        }}
-      >
-        Logout
-      </h4>
+      <Header
+        isLoggedIn={isLoggedIn}
+        username={user ? user.username : "Guest"}
+      />
+      <Navbar signout={signout} />
+      <BannerImage />
     </div>
   );
 };

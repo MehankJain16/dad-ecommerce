@@ -1,7 +1,8 @@
 import React, { useContext, useState, useEffect } from "react";
 import { Auth } from "../types/Auth";
-import { auth, provider, db } from "../firebase";
+import { auth, db } from "../firebase";
 import firebase from "firebase";
+import { User } from "../types/User";
 
 const AuthContext = React.createContext<Partial<Auth>>({});
 
@@ -15,11 +16,26 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<firebase.User | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
+    const getUserInfo = async (uid: string) => {
+      // Getting The User From Firestore DB
+      const dbUser = await db.doc(`users/${uid}`).get();
+
+      // Setting The User To Custom Type
+      const user: User = {
+        username: dbUser.get("username"),
+      };
+
+      setUser(user);
+    };
     const unsubscribe = auth.onAuthStateChanged((user) => {
       setCurrentUser(user);
+      if (user) {
+        getUserInfo(user ? user.uid : "");
+      }
       setLoading(false);
     });
 
@@ -44,9 +60,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return auth.signInWithEmailAndPassword(email, password);
   };
 
-  const googleSignin = async () => {
-    return auth.signInWithPopup(provider);
-  };
+  // const googleSignin = async () => {
+  //   return auth.signInWithPopup(provider);
+  // };
 
   const signout = () => {
     return auth.signOut();
@@ -54,9 +70,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const value: Auth = {
     currentUser: currentUser,
+    user: user,
     signup: create,
     signin: signin,
-    googleSignin: googleSignin,
+    // googleSignin: googleSignin,
     signout: signout,
   };
 

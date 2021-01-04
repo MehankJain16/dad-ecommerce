@@ -3,15 +3,15 @@ import { Alert, Button, Card, Container, Form, Spinner } from "react-bootstrap";
 import { Link, useHistory } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import "../styles/auth.css";
-import google from "../assets/google.svg";
+// import google from "../assets/google.svg";
 
 const Signin: React.FC = () => {
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
-  const { signin, googleSignin } = useAuth();
+  const { signin } = useAuth();
   const history = useHistory();
   const [loading, setLoading] = useState<boolean>(false);
-  const [loadingGoogle, setLoadingGoogle] = useState<boolean>(false);
+  // const [loadingGoogle, setLoadingGoogle] = useState<boolean>(false);
 
   const [emailError, setEmailError] = useState<string>("");
   const [passwordError, setPasswordError] = useState<string>("");
@@ -141,13 +141,13 @@ const Signin: React.FC = () => {
                 )}
                 {!loading && <p style={{ marginBottom: 0 }}>Sign In</p>}
               </Button>
-              <p
+              {/* <p
                 className="text-center mb-0 mt-3"
                 style={{ color: "#AAAAAA", fontSize: 12 }}
               >
                 OR
-              </p>
-              <Button
+              </p> */}
+              {/* <Button
                 onClick={async () => {
                   setLoadingGoogle(true);
                   await googleSignin!()
@@ -191,7 +191,7 @@ const Signin: React.FC = () => {
                     </p>
                   </div>
                 )}
-              </Button>
+              </Button> */}
               <h4 className="text-center auth-switch-text mt-4">
                 Don't Have An Account ? <Link to="/signup">Sign Up</Link>
               </h4>
