@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
+import { GlobalProvider } from "../contexts/GlobalContext";
 import BannerImage from "./BannerImage";
-import Header from "./Header";
 import Navbar from "./Navbar";
 
 const Home: React.FC = () => {
@@ -22,14 +22,16 @@ const Home: React.FC = () => {
   }, [user]);
 
   return (
-    <div>
-      <Header
-        isLoggedIn={isLoggedIn}
-        username={user ? user.username : "Guest"}
-      />
-      <Navbar signout={signout} />
-      <BannerImage />
-    </div>
+    <GlobalProvider>
+      <div>
+        <Navbar
+          signout={signout}
+          isLoggedIn={isLoggedIn}
+          username={user ? user.username : "Guest"}
+        />
+        <BannerImage />
+      </div>
+    </GlobalProvider>
   );
 };
 

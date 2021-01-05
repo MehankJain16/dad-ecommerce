@@ -19,6 +19,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
+  // Auth State Change
   useEffect(() => {
     const getUserInfo = async (uid: string) => {
       // Getting The User From Firestore DB
